@@ -36,8 +36,6 @@ class AutoPlayer():
 
         self.make_move(gamestate, self.bestPosition, self.bestAngle)
 
-
-
     def findbestMoveandRotation(self, gamestate):
         bestPosition = 0
         bestAngle = 0
