@@ -1,0 +1,1 @@
+This PDFs are UML diagrams automatically generated from the tetris source code by pyreverse (part of the pylint package)
