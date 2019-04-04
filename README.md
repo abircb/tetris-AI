@@ -8,4 +8,4 @@ This is my implementation of a Tetris game with a built-in autoplayer.
 <br />k- Rotate Left
 <br />l- Rotate Right
 <br />space- Hard drop
-<br /><strong>Note- only works with python version 3.7.0+</strong>
+<br /><strong>Compatibility: python version 3.7.0 or later</strong>
