@@ -1,0 +1,4 @@
+PyYAML==3.09
+Pygments==1.4
+SQLAlchemy==0.7.1
+South==0.7.3
