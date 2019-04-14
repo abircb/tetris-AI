@@ -5,7 +5,7 @@ Tetris has been released for virtually every computer and electronic gaming syst
 Essentially, the auto-player uses parameters- such as, height of the grid (the distance from the highest tile in each column to the bottom of the grid), complete lines (the number of complete lines in a grid), number of holes in the grid, etc.- to calculate a score for each possible position of a falling Tetris block. Naturally, each paramter is assigned a different weight, which is calculated using experience playing Tetris, researching different human-player strategies, and hit-and-trial.
 
 ## Usage ##
-<br />First, install all required dependancies. All dependancies are included in requirements.txt (created using pipreqs) Next, run the game by running tetris.py
+First, install all required dependancies. All dependancies are included in requirements.txt (created using pipreqs) Next, run the game by running tetris.py
 <br />To DISABLE the autoplayer, go to te_settings.py and set the boolean variable DEFAULT_AUTOPLAY to False
 <br />Controls:
 <br />a- Move Left
