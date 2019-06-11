@@ -1,4 +1,4 @@
 Pygments==1.4
+Tkinter==8.6
 ipython==2.0.0
-Django==2.2
 Fabric==1.2.0
