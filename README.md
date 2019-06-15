@@ -22,6 +22,7 @@ Run the game by running tetris.py
 ```
 python tetris.py
 ```
+![demo](/demo.gif)
 <br />To DISABLE the autoplayer, go to `te_settings.py`and set the boolean variable `DEFAULT_AUTOPLAY` to `false`
 <br />Controls:
 <br />`a`- Move Left
