@@ -1,14 +1,15 @@
-''' Implemented an AI to play tetris '''
+""" Implemented an AI to play tetris """
 
 from random import Random as rand
 from te_settings import Direction
 
-class AutoPlayer():
+
+class AutoPlayer:
     def __init__(self, controller):
         self.controller = controller
         self.rand = rand()
 
-        #weights
+        # weights
         self.holesWeight = -8.5
         self.totalHeightWeight = -3
         self.smoothnessWeight = -2.5
@@ -26,8 +27,8 @@ class AutoPlayer():
         self.prevY = -1
 
     def next_move(self, gamestate):
-        ''' next_move() is called by the game, once per move.
-            gamestate supplies access to all the state needed to autoplay the game.'''
+        """ next_move() is called by the game, once per move.
+            gamestate supplies access to all the state needed to autoplay the game."""
         x, y = gamestate.get_falling_block_position()
 
         if y < self.prevY:
@@ -47,7 +48,7 @@ class AutoPlayer():
 
                 oldScore = clone.get_score()
                 oldTiles = clone.get_tiles()
-                while(clone.update() == False):
+                while clone.update() == False:
                     x, y = clone.get_falling_block_position()
                     blockAngle = clone.get_falling_block_angle()
 
@@ -61,53 +62,64 @@ class AutoPlayer():
                     elif angle > blockAngle:
                         clone.rotate(Direction.RIGHT)
 
-                #check total height
+                # check total height
                 heights = self.calculateTotalHeight(clone)
                 totalHeight = sum(heights)
 
-                #smoothness
+                # smoothness
                 smoothness = self.calculateSmoothness(heights)
 
-                #holes
+                # holes
                 holes = self.calculateHoles(clone)
 
-                #completed Lines
+                # completed Lines
                 completedLines = self.calculateCompletedLines(oldScore, clone)
 
-                #Max and Min Y Canvas
+                # Max and Min Y Canvas
                 maxYCanvas = max(heights)
                 minYCanvas = min(heights)
 
-                #Range
+                # Range
                 rangeCanvas = maxYCanvas - minYCanvas
 
-                #num of holes
+                # num of holes
                 holeNum = self.findNumHoles(clone)
 
-                #Row movement
+                # Row movement
                 rowMovement, columnMovement = self.calculateRowAndColumnMovement(clone)
 
-                #block coor
+                # block coor
                 blockCoor = self.findBlockCoor(clone, oldTiles, completedLines)
                 blockHeightMax = max(blockCoor[1])
                 blockHeightMin = min(blockCoor[1])
-                blockHeightDelta = (blockHeightMax - blockHeightMin)/2
+                blockHeightDelta = (blockHeightMax - blockHeightMin) / 2
                 blockHeight = blockHeightMin + blockHeightDelta
 
-                #Calculating score
-                smoothnessScore = (smoothness * self.smoothnessWeight)
-                totalHeightScore = (totalHeight * self.totalHeightWeight)
-                completedLinesScore = (completedLines * self.completedLinesWeight)
-                rangeScore = (self.rangeWeight * rangeCanvas)
-                maxY_Score = (self.maxYWeight * maxYCanvas)
-                minY_Score = (self.minYWeight * minYCanvas)
-                holesNumScore = (self.holesNumWeight * holeNum)
-                rowMovementScore = (self.rowMovementWeight * rowMovement)
-                columnMovementScore = (self.columnMovementWeight * columnMovement)
-                blockHeightScore = (self.blockHeightWeight * blockHeight)
+                # Calculating score
+                smoothnessScore = smoothness * self.smoothnessWeight
+                totalHeightScore = totalHeight * self.totalHeightWeight
+                completedLinesScore = completedLines * self.completedLinesWeight
+                rangeScore = self.rangeWeight * rangeCanvas
+                maxY_Score = self.maxYWeight * maxYCanvas
+                minY_Score = self.minYWeight * minYCanvas
+                holesNumScore = self.holesNumWeight * holeNum
+                rowMovementScore = self.rowMovementWeight * rowMovement
+                columnMovementScore = self.columnMovementWeight * columnMovement
+                blockHeightScore = self.blockHeightWeight * blockHeight
 
-                #excuse the long line
-                score = smoothnessScore + totalHeightScore + completedLinesScore + rangeScore + maxY_Score + minY_Score + holesNumScore + rowMovementScore + columnMovementScore + blockHeightScore
+                # excuse the long line
+                score = (
+                    smoothnessScore
+                    + totalHeightScore
+                    + completedLinesScore
+                    + rangeScore
+                    + maxY_Score
+                    + minY_Score
+                    + holesNumScore
+                    + rowMovementScore
+                    + columnMovementScore
+                    + blockHeightScore
+                )
 
                 if score > bestScore:
                     bestScore = score
@@ -124,7 +136,7 @@ class AutoPlayer():
 
         for column in range(0, 10):
             for row in range(0, 20):
-                if (tiles[row][column] != 0):
+                if tiles[row][column] != 0:
                     columnHeights.append(20 - row)
                     break
                 elif row == 19:
@@ -146,15 +158,14 @@ class AutoPlayer():
             counter = 0
             gap = False
             for row in range(0, 20):
-                '''if row == 19 and tiles[row][column] == 0 and tiles[row - 1][column] != 0:
-                    counter += 1'''
+                """if row == 19 and tiles[row][column] == 0 and tiles[row - 1][column] != 0:
+                    counter += 1"""
                 if gap == True:
                     counter += 1
                 if row < 19 and tiles[row][column] != 0 and tiles[row + 1][column] == 0:
                     gap = True
                 if row < 19 and tiles[row][column] == 0 and tiles[row + 1][column] != 0:
                     gap = False
-
 
             numHoles += counter
 
@@ -167,12 +178,20 @@ class AutoPlayer():
 
         for column in range(0, 10):
             for row in range(0, 20):
-                if (row < 19 and (tiles[row][column] != tiles[row + 1][column]) and (tiles[row][column] == 0 or tiles[row + 1][column] == 0)):
+                if (
+                    row < 19
+                    and (tiles[row][column] != tiles[row + 1][column])
+                    and (tiles[row][column] == 0 or tiles[row + 1][column] == 0)
+                ):
                     columnMovement += 1
 
         for row in range(0, 20):
             for column in range(0, 10):
-                if (column < 9 and (tiles[row][column] != tiles[row][column + 1]) and (tiles[row][column] == 0 or tiles[row][column + 1] == 0)):
+                if (
+                    column < 9
+                    and (tiles[row][column] != tiles[row][column + 1])
+                    and (tiles[row][column] == 0 or tiles[row][column + 1] == 0)
+                ):
                     rowMovement += 1
 
         return (rowMovement, columnMovement)
@@ -184,7 +203,7 @@ class AutoPlayer():
 
         for column in range(0, 20):
             for row in range(0, 10):
-                if (tiles[row][column] != 0 and y ):
+                if tiles[row][column] != 0 and y:
                     canvasYCoorMax = y
                     break
         return canvasYCoorMax
@@ -195,7 +214,7 @@ class AutoPlayer():
 
         for y in range(0, 20):
             for x in range(0, 10):
-                if (oldTiles[y][x] != newTiles[y][x]):
+                if oldTiles[y][x] != newTiles[y][x]:
                     blockCoor.append((x, y))
         return blockCoor
 
@@ -217,13 +236,13 @@ class AutoPlayer():
         newScore = clone.get_score()
         diff = newScore - oldscore
 
-        if (100 < diff < 130):
+        if 100 < diff < 130:
             return 1
-        elif (400 < diff < 450):
+        elif 400 < diff < 450:
             return 2
-        elif (800 < diff < 850):
+        elif 800 < diff < 850:
             return 3
-        elif (1600 < diff < 1650):
+        elif 1600 < diff < 1650:
             return 4
         else:
             return 0

@@ -2,7 +2,8 @@ from copy import deepcopy, copy
 import time
 from te_settings import MAXROW, MAXCOL, Direction
 
-class BlockBitmap():
+
+class BlockBitmap:
     def __init__(self, rows, colour):
         self.rows = rows
         self.colour = colour
@@ -14,10 +15,10 @@ class BlockBitmap():
         for row in self.rows:
             for tile in row:
                 if tile == 0:
-                    txt = txt + '.'
+                    txt = txt + "."
                 else:
-                    txt = txt + '#'
-            txt = txt + '\n'
+                    txt = txt + "#"
+            txt = txt + "\n"
         return txt
 
     def clone(self):
@@ -79,88 +80,107 @@ class BlockBitmap():
         self.rows = newrows
         self.calculate_bounding_box()
 
+
 class IBlock(BlockBitmap):
-    ''' An IBlock is a BlockBitmap initialized with the state for the I-shaped black'''
+    """ An IBlock is a BlockBitmap initialized with the state for the I-shaped black"""
+
     def __init__(self):
-        BlockBitmap.__init__(self, ((0,0,0,0), (1,1,1,1), (0,0,0,0), (0,0,0,0)), "cyan")
+        BlockBitmap.__init__(
+            self, ((0, 0, 0, 0), (1, 1, 1, 1), (0, 0, 0, 0), (0, 0, 0, 0)), "cyan"
+        )
+
 
 class JBlock(BlockBitmap):
-    ''' A JBlock is a BlockBitmap initialized with the state for the J-shaped black'''
+    """ A JBlock is a BlockBitmap initialized with the state for the J-shaped black"""
+
     def __init__(self):
-        BlockBitmap.__init__(self, ((1,0,0), (1,1,1), (0,0,0)), "blue")
+        BlockBitmap.__init__(self, ((1, 0, 0), (1, 1, 1), (0, 0, 0)), "blue")
+
 
 class LBlock(BlockBitmap):
-    ''' A LBlock is a BlockBitmap initialized with the state for the L-shaped black'''
+    """ A LBlock is a BlockBitmap initialized with the state for the L-shaped black"""
+
     def __init__(self):
-        BlockBitmap.__init__(self, ((0,0,1), (1,1,1), (0,0,0)), "orange")
+        BlockBitmap.__init__(self, ((0, 0, 1), (1, 1, 1), (0, 0, 0)), "orange")
+
 
 class OBlock(BlockBitmap):
-    ''' A OBlock is a BlockBitmap initialized with the state for the square black'''
+    """ A OBlock is a BlockBitmap initialized with the state for the square black"""
+
     def __init__(self):
-        BlockBitmap.__init__(self, ((0,0,0,0), (0,1,1,0), (0,1,1,0), (0,0,0,0)), "yellow")
+        BlockBitmap.__init__(
+            self, ((0, 0, 0, 0), (0, 1, 1, 0), (0, 1, 1, 0), (0, 0, 0, 0)), "yellow"
+        )
+
 
 class SBlock(BlockBitmap):
-    ''' A SBlock is a BlockBitmap initialized with the state for the S-shaped black'''
+    """ A SBlock is a BlockBitmap initialized with the state for the S-shaped black"""
+
     def __init__(self):
-        BlockBitmap.__init__(self, ((0,1,1), (1,1,0), (0,0,0)), "green")
+        BlockBitmap.__init__(self, ((0, 1, 1), (1, 1, 0), (0, 0, 0)), "green")
+
 
 class TBlock(BlockBitmap):
-    ''' A TBlock is a BlockBitmap initialized with the state for the T-shaped black'''
+    """ A TBlock is a BlockBitmap initialized with the state for the T-shaped black"""
+
     def __init__(self):
-        BlockBitmap.__init__(self, ((0,1,0), (1,1,1), (0,0,0)), "purple")
+        BlockBitmap.__init__(self, ((0, 1, 0), (1, 1, 1), (0, 0, 0)), "purple")
+
 
 class ZBlock(BlockBitmap):
-    ''' A ZBlock is a BlockBitmap initialized with the state for the Z-shaped black'''
+    """ A ZBlock is a BlockBitmap initialized with the state for the Z-shaped black"""
+
     def __init__(self):
-        BlockBitmap.__init__(self, ((1,1,0), (0,1,1), (0,0,0)), "red")
+        BlockBitmap.__init__(self, ((1, 1, 0), (0, 1, 1), (0, 0, 0)), "red")
 
 
-class Block():
-    ''' A Block holds the state associated with the falling or next tetronimo '''
+class Block:
+    """ A Block holds the state associated with the falling or next tetronimo """
+
     def __init__(self, block_type, x, y, falling):
         self.__x = x
         self.__y = y
         self.__angle = 0
         self.__type = block_type
         self.__falling = falling
-        if block_type == 'I':
+        if block_type == "I":
             self.__bitmap = IBlock()
-        elif block_type == 'J':
+        elif block_type == "J":
             self.__bitmap = JBlock()
-        elif block_type == 'L':
+        elif block_type == "L":
             self.__bitmap = LBlock()
-        elif block_type == 'O':
+        elif block_type == "O":
             self.__bitmap = OBlock()
-        elif block_type == 'S':
+        elif block_type == "S":
             self.__bitmap = SBlock()
-        elif block_type == 'T':
+        elif block_type == "T":
             self.__bitmap = TBlock()
-        elif block_type == 'Z':
+        elif block_type == "Z":
             self.__bitmap = ZBlock()
 
     @property
     def position(self):
-        ''' accessor function associated with getting from the position read-only attribute '''
+        """ accessor function associated with getting from the position read-only attribute """
         return (self.__x, self.__y)
 
     @property
     def angle(self):
-        ''' accessor function associated with getting from the angle read-only attribute '''
+        """ accessor function associated with getting from the angle read-only attribute """
         return self.__angle
 
     @property
     def bitmap(self):
-        ''' accessor function associated with getting from the bitmap read-only attribute '''
+        """ accessor function associated with getting from the bitmap read-only attribute """
         return self.__bitmap
 
     @property
     def colour(self):
-        ''' accessor function associated with getting from the colour read-only attribute '''
+        """ accessor function associated with getting from the colour read-only attribute """
         return self.__bitmap.colour
 
     @property
     def type(self):
-        ''' accessor function associated with getting from the type read-only attribute '''
+        """ accessor function associated with getting from the type read-only attribute """
         return self.__type
 
     @property
@@ -198,25 +218,25 @@ class Block():
             self.__angle = self.__angle - 4
         newbitmap.rotate(direction)
         self.__bitmap = newbitmap
-        #if the rotation fouls a wall, kick off the wall
+        # if the rotation fouls a wall, kick off the wall
         (xmin, _, xmax, _) = self.bounding_box
         while self.__x + xmin < 0:
             self.__x = self.__x + 1
         while self.__x + xmax >= MAXCOL:
             self.__x = self.__x - 1
-        #if the resulting rotation now fouls another block, back it out
+        # if the resulting rotation now fouls another block, back it out
         if blockfield.collision(self, 0, 0):
             self.__bitmap = oldbitmap
             self.__x = orig_x
             self.__y = orig_y
             self.__angle = orig_angle
 
-    #drop the block.  return a tuple (True, score) if it has landed,
+    # drop the block.  return a tuple (True, score) if it has landed,
     # (False, 0) if it has not landed.
     def drop(self, blockfield):
         (_, block_y) = self.position
         (_, _, _, ymax) = self.bounding_box
-        if (block_y + ymax == MAXROW-1) or blockfield.collision(self, 0, 1):
+        if (block_y + ymax == MAXROW - 1) or blockfield.collision(self, 0, 1):
             score = blockfield.land(self)
             return (True, score)
         self.__y = self.__y + 1
@@ -225,8 +245,9 @@ class Block():
     def get_copy_of_tiles(self):
         return self.__bitmap.get_copy_of_tiles()
 
+
 # BlockField holds all the blocks and pieces of blocks that have landed
-class BlockField():
+class BlockField:
     def __init__(self):
         self.__tiles = []
         for _y in range(0, MAXROW):
@@ -245,8 +266,7 @@ class BlockField():
             newtiles.append(tuple(row))
         return newtiles
 
-
-    #check for a collision if the block moves in the direction indicated by xoffset,yoffset
+    # check for a collision if the block moves in the direction indicated by xoffset,yoffset
     def collision(self, block, xoffset, yoffset):
         (block_x, block_y) = block.position
         (xmin, ymin, xmax, ymax) = block.bounding_box
@@ -258,10 +278,13 @@ class BlockField():
             return True
 
         bitmap = block.bitmap.rows
-        for _y in range(ymin, ymax+1):
-            for _x in range(xmin, xmax+1):
+        for _y in range(ymin, ymax + 1):
+            for _x in range(xmin, xmax + 1):
                 if bitmap[_y][_x] != 0:
-                    if self.__tiles[block_y + _y + yoffset][block_x + _x + xoffset] != 0:
+                    if (
+                        self.__tiles[block_y + _y + yoffset][block_x + _x + xoffset]
+                        != 0
+                    ):
                         return True
         return False
 
@@ -269,8 +292,8 @@ class BlockField():
         (block_x, block_y) = block.position
         bitmap = block.bitmap.rows
         (xmin, ymin, xmax, ymax) = block.bounding_box
-        for _y in range(ymin, ymax+1):
-            for _x in range(xmin, xmax+1):
+        for _y in range(ymin, ymax + 1):
+            for _x in range(xmin, xmax + 1):
                 if bitmap[_y][_x] != 0:
                     self.__tiles[block_y + _y][block_x + _x] = block.colour
         score = self.check_full_rows()
@@ -291,16 +314,17 @@ class BlockField():
             count = 0
             for _x in range(0, MAXCOL):
                 if self.__tiles[_y][_x] != 0:
-                    count = count+1
+                    count = count + 1
             if count == MAXCOL:
                 self.drop_row(_y)
                 rows_dropped = rows_dropped + 1
         return scores[rows_dropped]
 
-class Model():
+
+class Model:
     def __init__(self, controller):
         self.__controller = controller
-        self.blocktypes = ['I', 'J', 'L', 'O', 'S', 'T', 'Z']
+        self.blocktypes = ["I", "J", "L", "O", "S", "T", "Z"]
         self.__falling_block = 0
         self.__is_dummy = False
         self.__blockfield = None
@@ -315,14 +339,17 @@ class Model():
     def start(self):
         self.restart()
 
-    #clone produces a new version of the model, so we can run what-if
-    #tests on it without modifying the original.
+    # clone produces a new version of the model, so we can run what-if
+    # tests on it without modifying the original.
     # set is_dummy to True if you don't want to update the controller/screen
     def clone(self, is_dummy):
         newmodel = copy(self)
-        newmodel.copy_in_state(is_dummy, deepcopy(self.__blockfield),
-                               deepcopy(self.__falling_block),
-                               deepcopy(self.__next_block))
+        newmodel.copy_in_state(
+            is_dummy,
+            deepcopy(self.__blockfield),
+            deepcopy(self.__falling_block),
+            deepcopy(self.__next_block),
+        )
         return newmodel
 
     def copy_in_state(self, is_dummy, blockfield, falling_block, next_block):
@@ -330,7 +357,6 @@ class Model():
         self.__blockfield = blockfield
         self.__falling_block = falling_block
         self.__next_block = next_block
-
 
     @property
     def blockfield(self):
@@ -375,7 +401,7 @@ class Model():
         return self.__is_dummy
 
     def __create_new_block(self, falling):
-        block_x = MAXCOL//2 - 2
+        block_x = MAXCOL // 2 - 2
         block_y = 0
         blocknum = self.__controller.get_random_blocknum()
         blocktype = self.blocktypes[blocknum]
@@ -384,7 +410,7 @@ class Model():
 
     def __check_falling_block(self, now):
         if (now - self.__last_drop > self.__move_time) or self.__is_dummy:
-            self.__score = self.__score + 1 # score 1 point for each row a block drops
+            self.__score = self.__score + 1  # score 1 point for each row a block drops
             (landed, scorechange) = self.__falling_block.drop(self.__blockfield)
             self.__last_drop = now
             if landed:
@@ -443,7 +469,7 @@ class Model():
 
     def restart(self):
         self.init_score()
-        #create game objects
+        # create game objects
         if self.__falling_block != 0:
             self.__controller.unregister_block(self.__falling_block)
             self.__controller.unregister_block(self.__next_block)

@@ -6,12 +6,13 @@ from te_gamestate import GameState
 from te_view import View
 from te_autoplayer import AutoPlayer
 
-class Controller():
+
+class Controller:
     def __init__(self):
         if not DISABLE_DISPLAY:
             self.__root = Tk()
-            self.__windowsystem = self.__root.call('tk', 'windowingsystem')
-            self.__root.bind_all('<Key>', self.key)
+            self.__windowsystem = self.__root.call("tk", "windowingsystem")
+            self.__root.bind_all("<Key>", self.key)
         self.__running = True
         self.__score = -1
         self.__autoplay = DEFAULT_AUTOPLAY
@@ -28,13 +29,13 @@ class Controller():
     # Generate a list of random blocks.  This is done as a start-up, so any
     #  use one makes of random numbers does not change the sequence of
     # blocks.
-    
+
     def __gen_random(self):
         self.__rand = Random()
         self.__rand.seed(42)
         self.rand_ix = 0
         self.maxrand = 100000
-        maxblocktype = 6 # there are 7 different block types, indexed 0 to 6
+        maxblocktype = 6  # there are 7 different block types, indexed 0 to 6
         self.randlist = []
         for _i in range(self.maxrand):
             self.randlist.append(self.__rand.randint(0, maxblocktype))
@@ -58,8 +59,8 @@ class Controller():
         if not DISABLE_DISPLAY:
             self.__view.update_blockfield(blockfield)
 
-    #some helper functions to hide the controller implementation from
-    #the model and the controller
+    # some helper functions to hide the controller implementation from
+    # the model and the controller
     def update_score(self, score):
         self.__score = score
 
@@ -76,24 +77,24 @@ class Controller():
             self.__view.game_over()
 
     def key(self, event):
-        if event.char == ' ':
+        if event.char == " ":
             self.__model.drop_block()
-        elif event.char == 'q':
+        elif event.char == "q":
             self.__running = False
-        elif event.char == 'a':
+        elif event.char == "a":
             self.__model.move(Direction.LEFT)
-        elif event.char == 's':
+        elif event.char == "s":
             self.__model.move(Direction.RIGHT)
-        elif event.char == 'k':
+        elif event.char == "k":
             self.__model.rotate(Direction.LEFT)
-        elif event.char == 'l':
+        elif event.char == "l":
             self.__model.rotate(Direction.RIGHT)
-        elif event.char == 'y':
+        elif event.char == "y":
             self.__autoplay = not self.__autoplay
             self.__model.enable_autoplay(self.__autoplay)
             if not DISABLE_DISPLAY:
                 self.__view.show_autoplay(self.__autoplay)
-        elif event.char == 'r':
+        elif event.char == "r":
             if not DISABLE_DISPLAY:
                 self.__view.clear_messages()
             self.__lost = False
