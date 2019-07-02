@@ -2,6 +2,8 @@
 A reenvisioned version of Alexey Pajitnov's orignal Tetris game with a built-in autoplayer. 
 Tetris has been released for virtually every computer and electronic gaming system, and it is often revered as a classic. Though numerous sequels have been spawned, Tetris games almost always have the same play mechanics: differently shaped blocks drop at varying speeds, and, as the blocks descend, the player must rotate and arrange them to create an uninterrupted horizontal row on the screen. When the player forms one or more solid rows, the completed rows disappear. The goal of the game is to prevent the blocks from stacking up to the top of the screen for as long as possible. This version of the game essentially uses the same mechanics, but comes with an auto-player that has, on average, a score of 5,000,000.
 
+![demo](/demo.gif)
+
 The auto-player algorithm is a very simple genetic algorithm. It does the following:
 <ol>
   <li>Look at the current block and the next block and simulate ALL possible combinations (positions and rotations) of the two blocks.</li>
@@ -22,7 +24,6 @@ Run the game by running tetris.py
 ```
 python tetris.py
 ```
-![demo](/demo.gif)
 <br />To DISABLE the autoplayer, go to `te_settings.py`and set the boolean variable `DEFAULT_AUTOPLAY` to `false`
 <br />Controls:
 <br />`a`- Move Left
