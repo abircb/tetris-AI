@@ -32,12 +32,145 @@ class AutoPlayer:
         x, y = gamestate.get_falling_block_position()
 
         if y < self.prevY:
-            self.bestPosition, self.bestAngle = self.findbestMoveandRotation(gamestate)
+            self.bestPosition, self.bestAngle = self.best_move(gamestate)
         self.prevY = y
 
         self.make_move(gamestate, self.bestPosition, self.bestAngle)
 
-    def findbestMoveandRotation(self, gamestate):
+    def calculate_total_height(self, Clone):
+        """ Computes the aggregate height; takes the sum of the height of each column
+        (the distance from the highest tile in each column to the bottom of the grid)"""
+        tiles = Clone.get_tiles()
+        columnHeights = []
+
+        for column in range(0, 10):
+            for row in range(0, 20):
+                if tiles[row][column] != 0:
+                    columnHeights.append(20 - row)
+                    break
+                elif row == 19:
+                    columnHeights.append(0)
+
+        return columnHeights
+
+    def calculate_smoothness(self, heights):
+        """ The smoothness of a grid tells us the variation of its column heights. """
+        smoothness = 0
+        for x in range(len(heights) - 1):
+            smoothness += abs(heights[x] - heights[x + 1])
+        return smoothness
+
+    def holes(self, clone):
+        tiles = clone.get_tiles()
+        numHoles = 0
+        for column in range(0, 10):
+            counter = 0
+            gap = False
+            for row in range(0, 20):
+                """if row == 19 and tiles[row][column] == 0 and tiles[row - 1][column] != 0:
+                    counter += 1"""
+                if gap == True:
+                    counter += 1
+                if row < 19 and tiles[row][column] != 0 and tiles[row + 1][column] == 0:
+                    gap = True
+                if row < 19 and tiles[row][column] == 0 and tiles[row + 1][column] != 0:
+                    gap = False
+
+            numHoles += counter
+
+        return numHoles
+
+    def calculate_RowAndColumn_Movement(self, clone):
+        tiles = clone.get_tiles()
+        rowMovement = 0
+        columnMovement = 0
+
+        for column in range(0, 10):
+            for row in range(0, 20):
+                if (
+                    row < 19
+                    and (tiles[row][column] != tiles[row + 1][column])
+                    and (tiles[row][column] == 0 or tiles[row + 1][column] == 0)
+                ):
+                    columnMovement += 1
+
+        for row in range(0, 20):
+            for column in range(0, 10):
+                if (
+                    column < 9
+                    and (tiles[row][column] != tiles[row][column + 1])
+                    and (tiles[row][column] == 0 or tiles[row][column + 1] == 0)
+                ):
+                    rowMovement += 1
+
+        return (rowMovement, columnMovement)
+
+    def findMaxYCanvas(self, clone):
+        tiles = clone.get_tiles()
+        canvasYCoorMax = 0
+        blockCoor = []
+
+        for column in range(0, 20):
+            for row in range(0, 10):
+                if tiles[row][column] != 0 and y:
+                    canvasYCoorMax = y
+                    break
+        return canvasYCoorMax
+
+    def find_block_coordinate(self, clone, oldTiles, completedLines):
+        newTiles = clone.get_tiles()
+        blockCoor = []
+
+        for y in range(0, 20):
+            for x in range(0, 10):
+                if oldTiles[y][x] != newTiles[y][x]:
+                    blockCoor.append((x, y))
+        return blockCoor
+
+    def calculate_holes(self, clone):
+        """computes the number of 'holes' in the grid. A hole is defined as an empty space such that
+        there is at least one tile in the same column above it."""
+        tiles = clone.get_tiles()
+        holes = 0
+
+        for row in range(0, 20):
+            for column in range(0, 10):
+                if row < 19 and tiles[row][column] != 0 and tiles[row + 1][column] == 0:
+                    holes += 1
+        return holes
+
+    def calculate_completed_lines(self, oldscore, clone):
+        """ This is probably the most intuitive heuristic among the four. It is simply the
+         number of complete lines in a grid. """
+        newScore = clone.get_score()
+        diff = newScore - oldscore
+
+        if 100 < diff < 130:
+            return 1
+        elif 400 < diff < 450:
+            return 2
+        elif 800 < diff < 850:
+            return 3
+        elif 1600 < diff < 1650:
+            return 4
+        else:
+            return 0
+
+    def make_move(self, gamestate, targetPosition, targetAngle):
+        x, y = gamestate.get_falling_block_position()
+        angle = gamestate.get_falling_block_angle()
+
+        if targetPosition > x:
+            gamestate.move(Direction.RIGHT)
+        if targetPosition < x:
+            gamestate.move(Direction.LEFT)
+
+        if targetAngle == 3 and angle == 0:
+            gamestate.rotate(Direction.LEFT)
+        elif targetAngle > angle:
+            gamestate.rotate(Direction.RIGHT)
+
+    def best_move(self, gamestate):
         bestPosition = 0
         bestAngle = 0
         bestScore = -10000000000
@@ -63,17 +196,17 @@ class AutoPlayer:
                         clone.rotate(Direction.RIGHT)
 
                 # check total height
-                heights = self.calculateTotalHeight(clone)
+                heights = self.calculate_total_height(clone)
                 totalHeight = sum(heights)
 
                 # smoothness
-                smoothness = self.calculateSmoothness(heights)
+                smoothness = self.calculate_smoothness(heights)
 
                 # holes
-                holes = self.calculateHoles(clone)
+                holes = self.calculate_holes(clone)
 
                 # completed Lines
-                completedLines = self.calculateCompletedLines(oldScore, clone)
+                completedLines = self.calculate_completed_lines(oldScore, clone)
 
                 # Max and Min Y Canvas
                 maxYCanvas = max(heights)
@@ -83,13 +216,15 @@ class AutoPlayer:
                 rangeCanvas = maxYCanvas - minYCanvas
 
                 # num of holes
-                holeNum = self.findNumHoles(clone)
+                holeNum = self.holes(clone)
 
                 # Row movement
-                rowMovement, columnMovement = self.calculateRowAndColumnMovement(clone)
+                rowMovement, columnMovement = self.calculate_RowAndColumn_Movement(
+                    clone
+                )
 
                 # block coor
-                blockCoor = self.findBlockCoor(clone, oldTiles, completedLines)
+                blockCoor = self.find_block_coordinate(clone, oldTiles, completedLines)
                 blockHeightMax = max(blockCoor[1])
                 blockHeightMin = min(blockCoor[1])
                 blockHeightDelta = (blockHeightMax - blockHeightMin) / 2
@@ -127,136 +262,3 @@ class AutoPlayer:
                     bestAngle = angle
 
         return (bestPosition, bestAngle)
-
-    def calculateTotalHeight(self, Clone):
-        """ Computes the aggregate height; takes the sum of the height of each column
-        (the distance from the highest tile in each column to the bottom of the grid)"""
-        tiles = Clone.get_tiles()
-        columnHeights = []
-
-        for column in range(0, 10):
-            for row in range(0, 20):
-                if tiles[row][column] != 0:
-                    columnHeights.append(20 - row)
-                    break
-                elif row == 19:
-                    columnHeights.append(0)
-
-        return columnHeights
-
-    def calculateSmoothness(self, heights):
-        """ The smoothness of a grid tells us the variation of its column heights. """
-        smoothness = 0
-        for x in range(len(heights) - 1):
-            smoothness += abs(heights[x] - heights[x + 1])
-        return smoothness
-
-    def findNumHoles(self, clone):
-        tiles = clone.get_tiles()
-        numHoles = 0
-        for column in range(0, 10):
-            counter = 0
-            gap = False
-            for row in range(0, 20):
-                """if row == 19 and tiles[row][column] == 0 and tiles[row - 1][column] != 0:
-                    counter += 1"""
-                if gap == True:
-                    counter += 1
-                if row < 19 and tiles[row][column] != 0 and tiles[row + 1][column] == 0:
-                    gap = True
-                if row < 19 and tiles[row][column] == 0 and tiles[row + 1][column] != 0:
-                    gap = False
-
-            numHoles += counter
-
-        return numHoles
-
-    def calculateRowAndColumnMovement(self, clone):
-        tiles = clone.get_tiles()
-        rowMovement = 0
-        columnMovement = 0
-
-        for column in range(0, 10):
-            for row in range(0, 20):
-                if (
-                    row < 19
-                    and (tiles[row][column] != tiles[row + 1][column])
-                    and (tiles[row][column] == 0 or tiles[row + 1][column] == 0)
-                ):
-                    columnMovement += 1
-
-        for row in range(0, 20):
-            for column in range(0, 10):
-                if (
-                    column < 9
-                    and (tiles[row][column] != tiles[row][column + 1])
-                    and (tiles[row][column] == 0 or tiles[row][column + 1] == 0)
-                ):
-                    rowMovement += 1
-
-        return (rowMovement, columnMovement)
-
-    def findMaxYCanvas(self, clone):
-        tiles = clone.get_tiles()
-        canvasYCoorMax = 0
-        blockCoor = []
-
-        for column in range(0, 20):
-            for row in range(0, 10):
-                if tiles[row][column] != 0 and y:
-                    canvasYCoorMax = y
-                    break
-        return canvasYCoorMax
-
-    def findBlockCoor(self, clone, oldTiles, completedLines):
-        newTiles = clone.get_tiles()
-        blockCoor = []
-
-        for y in range(0, 20):
-            for x in range(0, 10):
-                if oldTiles[y][x] != newTiles[y][x]:
-                    blockCoor.append((x, y))
-        return blockCoor
-
-    def calculateHoles(self, clone):
-        """computes the number of 'holes' in the grid. A hole is defined as an empty space such that
-        there is at least one tile in the same column above it."""
-        tiles = clone.get_tiles()
-        holes = 0
-
-        for row in range(0, 20):
-            for column in range(0, 10):
-                if row < 19 and tiles[row][column] != 0 and tiles[row + 1][column] == 0:
-                    holes += 1
-        return holes
-
-    def calculateCompletedLines(self, oldscore, clone):
-        """ This is probably the most intuitive heuristic among the four. It is simply the
-         number of complete lines in a grid. """
-        newScore = clone.get_score()
-        diff = newScore - oldscore
-
-        if 100 < diff < 130:
-            return 1
-        elif 400 < diff < 450:
-            return 2
-        elif 800 < diff < 850:
-            return 3
-        elif 1600 < diff < 1650:
-            return 4
-        else:
-            return 0
-
-    def make_move(self, gamestate, targetPosition, targetAngle):
-        x, y = gamestate.get_falling_block_position()
-        angle = gamestate.get_falling_block_angle()
-
-        if targetPosition > x:
-            gamestate.move(Direction.RIGHT)
-        if targetPosition < x:
-            gamestate.move(Direction.LEFT)
-
-        if targetAngle == 3 and angle == 0:
-            gamestate.rotate(Direction.LEFT)
-        elif targetAngle > angle:
-            gamestate.rotate(Direction.RIGHT)
