@@ -1,4 +1,4 @@
-Pygments==1.4
+Pygments==2.7.4
 Tkinter==8.6
 ipython==2.0.0
 Fabric==1.2.0
